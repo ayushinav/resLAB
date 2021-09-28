@@ -159,3 +159,48 @@ def gt_cond(T, Cw=0.0):
     C= {'polaron': C_polaron, 'proton': C_proton, 'total': C_tot, 'gt': C_gt};
     
     return [idx, C];
+
+def bulk_cond(comp, T, cw):
+    _, ol= ol_cond(T, Cw= cw['ol'])# 0.005);
+    if cw['ol']==0.:
+        ol= ol['total'];
+    else:
+        ol= ol['ol'];
+        
+    _, opx= opx_cond(T, Cw= cw['opx']) # 0.001);
+    if cw['opx']==0.:
+        opx= opx['total'];
+    else:
+        opx= opx['opx'];
+    
+    _, cpx= cpx_cond(T, Cw= cw['cpx']) #90/(10**6));
+    if cw['cpx']==0.:
+        cpx= cpx['total'];
+    else:
+        cpx= cpx['ol'];
+        
+    _, gt= gt_cond(T);
+    gt= gt['gt'];
+    
+    cond= np.array([ol, opx, cpx, gt]);
+    c_max= np.array([np.max(cond[:,i]) for i in range(0, len(T))]);
+    c_min= np.array([np.min(cond[:,i]) for i in range(0, len(T))]);
+    HS_l= np.array([1/np.sum(comp/(cond[:,i]+2*c_min[i]))- 2*c_min[i] for i in range(0, len(T))]);
+    HS_u= np.array([1/np.sum(comp/(cond[:,i]+2*c_max[i]))- 2*c_max[i] for i in range(0, len(T))]);
+    #print(cond)
+    HS= {"lower": HS_l, "upper": HS_u};
+    
+    return HS;
+
+def get_cw(comp, Cw, D2, D1= 2.0):
+    """
+    comp= Mineral composition
+    Cw= Total water composition
+    D1= D_cpx/opx
+    D2= D_cpx/ol
+    """ 
+
+    D3= D1*D2; # D_opx/ol;
+    x= Cw/(comp["ol"]+ comp["opx"]*D3+ comp["cpx"]*D1);
+    cw= {"ol":x, "cpx": D1*x, "opx": D3*x, "gt":0.0};
+    print("For garnet, cw= %d, initial value is 0." %(cw["gt"]))
