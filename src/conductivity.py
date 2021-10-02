@@ -7,7 +7,7 @@ import math;
 def ol_cond(T, Cw=0.0):
     """
     T= Temperature in Kelvin
-    Cw= Concentration of water
+    Cw= Concentration of water (in wt. %)
     """
     k= 8.61734279*10**-5;
     # ionic 
@@ -49,7 +49,7 @@ def ol_cond(T, Cw=0.0):
 def opx_cond(T, Cw=0.0):
     """
     T= Temperature in Kelvin
-    Cw= Concentration of water
+    Cw= Concentration of water (in wt. %)
     """
     k= 8.61734279*10**-5;
     
@@ -81,10 +81,10 @@ def opx_cond(T, Cw=0.0):
     return [idx, C];
 
 
-def cpx_cond(T, Cw=0.0):
+def cpx_cond(T, Cw):
     """
     T= Temperature in Kelvin
-    Cw= Concentration of water
+    Cw= Concentration of water (in wt. %)
     """
     k= 8.61734279*10**-5;
     
@@ -121,7 +121,7 @@ def cpx_cond(T, Cw=0.0):
 def gt_cond(T, Cw=0.0):
     """
     T= Temperature in Kelvin
-    Cw= Concentration of water
+    Cw= Concentration of water (in wt. %)
     """
     k= 8.61734279*10**-5;
     P= 8;
@@ -160,6 +160,7 @@ def gt_cond(T, Cw=0.0):
     
     return [idx, C];
 
+
 def bulk_cond(comp, T, cw):
     _, ol= ol_cond(T, Cw= cw['ol'])# 0.005);
     if cw['ol']==0.:
@@ -174,11 +175,9 @@ def bulk_cond(comp, T, cw):
         opx= opx['opx'];
     
     _, cpx= cpx_cond(T, Cw= cw['cpx']) #90/(10**6));
-    if cw['cpx']==0.:
-        cpx= cpx['total'];
-    else:
-        cpx= cpx['ol'];
-        
+    
+    cpx= cpx['cpx'];
+    
     _, gt= gt_cond(T);
     gt= gt['gt'];
     
@@ -192,6 +191,7 @@ def bulk_cond(comp, T, cw):
     
     return HS;
 
+
 def get_cw(comp, Cw, D2, D1= 2.0):
     """
     comp= Mineral composition
@@ -201,6 +201,8 @@ def get_cw(comp, Cw, D2, D1= 2.0):
     """ 
 
     D3= D1*D2; # D_opx/ol;
-    x= Cw/(comp["ol"]+ comp["opx"]*D3+ comp["cpx"]*D1);
-    cw= {"ol":x, "cpx": D1*x, "opx": D3*x, "gt":0.0};
-    print("For garnet, cw= %d, initial value is 0." %(cw["gt"]))
+    comp[0]= comp[0]+ comp[3]; # water content is identical in olivine and garnet
+    x= Cw/(comp[0]+ comp[1]*D3+ comp[2]*D1);
+    cw= {"ol":x, "cpx": D1*x, "opx": D3*x, "gt":x};
+    return cw
+
