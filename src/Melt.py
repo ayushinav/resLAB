@@ -28,3 +28,12 @@ def melt_basaltic(T, P= 1):
     if P==2:
         C_melt= C_melt/(10**0.2);
     return C_melt;
+
+def bulk_cond_melt(X, melt_cond, solid_cond):
+    HS_u= melt_cond+ (1- X)/(1/(solid_cond+ melt_cond)+
+                            X/(3*melt_cond));
+    HS_l= solid_cond+ (1- X)/(1/(solid_cond+ melt_cond)+
+                            (1- X)/(3*melt_cond));
+    
+    HS= {"HS_upper": HS_u, "HS_lower": HS_l};
+    return HS;
