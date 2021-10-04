@@ -20,7 +20,7 @@ def geotherm(Qs, Ts, A, k, z):
     depth= np.array([]);
     gtherm= np.array([]);
     for i in range(0, n):
-        print(Q*1000)
+        #print(Q*1000)
         Z= np.arange(z_1, z[i]+1, 1);
         
         temp= -A[i]/2/k[i]* Z*Z+ (Q+ A[i]*z_1)/k[i]* Z + (T- Q/k[i]*z_1- A[i]/2/k[i]* z_1**2);
@@ -29,7 +29,7 @@ def geotherm(Qs, Ts, A, k, z):
         Q= Q+ A[i]*(z_1- z[i]);
         T= temp[-1]; 
         z_1= z[i];
-        print(Q, "\t", temp[-1])
+        #print(Q, "\t", temp[-1])
     
     print("Temperature at lowermost layer is %d K" %(T));
     print("Heat flow estimated at lowermost interface is %1.5f Wm-2 K-1" %(Q));
